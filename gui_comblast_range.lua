@@ -1,12 +1,12 @@
 function widget:GetInfo()
   return {
-    name      = "Comblast Range v2",
+    name      = "Comblast Range v3",
     desc      = "Draws a circle that displays commander blast range",
     author    = "TheFatController",
     date      = "January 24, 2009",
     license   = "MIT/X11",
     layer     = 0,
-    version   = 2,
+    version   = 3,
     enabled   = true  -- loaded by default
   }
 end
@@ -15,12 +15,14 @@ end
 
 --Changelog
 -- v2 [teh]decay Fix spectator mode + replace hardcoded radius with one from weaponDef + handle luaui reload situation
+-- v3 [teh]decay Draw circles for visible enemy commanders too! +Fix spectator mode when /fullspecview is used + code speedup
+
 
 local GetUnitPosition     = Spring.GetUnitPosition
 local glDrawGroundCircle  = gl.DrawGroundCircle
 local GetUnitDefID = Spring.GetUnitDefID
-local spGetTeamUnits	= Spring.GetTeamUnits
 local lower                 = string.lower
+local spGetVisibleUnits = Spring.GetVisibleUnits
 
 local blastCircleDivs = 100
 local weapNamTab		  = WeaponDefNames
@@ -69,22 +71,25 @@ function widget:DrawWorldPreUnit()
 
   for unitID in pairs(commanders) do
     local x,y,z = GetUnitPosition(unitID)
-    local udef = udefTab[GetUnitDefID(unitID)]
-    local blastRadius = 380;
+    local udefId = GetUnitDefID(unitID);
+    if udefId ~= nil then
+        local udef = udefTab[udefId]
+        local blastRadius = 380;
 
-    local deathBlastId = weapNamTab[lower(udef[explodeTag])].id
-    local selfdBlastId = weapNamTab[lower(udef[selfdTag])].id
+        local deathBlastId = weapNamTab[lower(udef[explodeTag])].id
+        local selfdBlastId = weapNamTab[lower(udef[selfdTag])].id
 
-    local deathBlastRadius = weapTab[deathBlastId][aoeTag]
-    local selfdBlastRadius = weapTab[selfdBlastId][aoeTag]
+        local deathBlastRadius = weapTab[deathBlastId][aoeTag]
+        local selfdBlastRadius = weapTab[selfdBlastId][aoeTag]
 
-    if deathBlastRadius ~= selfdBlastRadius then
-        gl.Color(1, 0, 0, .5)
-        glDrawGroundCircle(x, y, z, deathBlastRadius, blastCircleDivs)
+        if deathBlastRadius ~= selfdBlastRadius then
+            gl.Color(1, 0, 0, .5)
+            glDrawGroundCircle(x, y, z, deathBlastRadius, blastCircleDivs)
+        end
+
+        gl.Color(1, 1, 0, .5)
+        glDrawGroundCircle(x, y, z, selfdBlastRadius, blastCircleDivs)
     end
-
-    gl.Color(1, 1, 0, .5)
-    glDrawGroundCircle(x, y, z, selfdBlastRadius, blastCircleDivs)
   end
   gl.DepthTest(false)
 end
@@ -104,23 +109,16 @@ function detectSpectatorView()
 
     if spec then
         spectatorMode = true
+    end
 
-        local roster = Spring.GetPlayerRoster(1, true)
-        for _, player in ipairs(roster) do
-            local teamId = player[3]
-            if teamId ~= nil then
-                Spring.Echo("teamId" .. teamId)
-                for _, unitID in ipairs(spGetTeamUnits(teamId)) do
-                    if udefTab[GetUnitDefID(unitID)].canManualFire then
-                        commanders[unitID] = true
-                    end
+    visibleUnits = spGetVisibleUnits()
+    if visibleUnits ~= nil then
+        for _, unitID in ipairs(visibleUnits) do
+            local udefId = GetUnitDefID(unitID)
+            if udefId ~= nil then
+                if udefTab[udefId].canManualFire then
+                    commanders[unitID] = true
                 end
-            end
-        end
-    else
-        for _, unitID in ipairs(spGetTeamUnits(teamId)) do
-            if udefTab[GetUnitDefID(unitID)].canManualFire then
-                commanders[unitID] = true
             end
         end
     end
