@@ -37,7 +37,7 @@ local aoeTag = "damageAreaOfEffect"
 local commanders = {}
 
 local spectatorMode = false
-local inSpecfullmode = false
+local notInSpecfullmode = false
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
   if UnitDefs[unitDefID].canManualFire then
@@ -71,13 +71,13 @@ end
 function widget:DrawWorldPreUnit()
   local _, specFullView, _ = spGetSpectatingState()
 
-  if specFullView then
-      inSpecfullmode = true
+  if not specFullView then
+      notInSpecfullmode = true
   else
-      if inSpecfullmode then
+      if notInSpecfullmode then
           detectSpectatorView()
       end
-      inSpecfullmode = false
+      notInSpecfullmode = false
   end
 
   gl.DepthTest(true)
