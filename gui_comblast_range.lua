@@ -111,7 +111,7 @@ function detectSpectatorView()
         spectatorMode = true
     end
 
-    visibleUnits = spGetVisibleUnits()
+    local visibleUnits = spGetVisibleUnits()
     if visibleUnits ~= nil then
         for _, unitID in ipairs(visibleUnits) do
             local udefId = GetUnitDefID(unitID)
