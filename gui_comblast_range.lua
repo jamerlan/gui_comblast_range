@@ -1,12 +1,12 @@
 function widget:GetInfo()
   return {
-    name      = "Comblast Range v4",
+    name      = "Comblast Range v5",
     desc      = "Draws a circle that displays commander blast range",
     author    = "TheFatController",
     date      = "January 24, 2009",
     license   = "MIT/X11",
     layer     = 0,
-    version   = 4,
+    version   = 5,
     enabled   = true  -- loaded by default
   }
 end
@@ -17,13 +17,16 @@ end
 -- v2 [teh]decay Fix spectator mode + replace hardcoded radius with one from weaponDef + handle luaui reload situation
 -- v3 [teh]decay Draw circles for visible enemy commanders too! +Fix spectator mode when /fullspecview is used + code speedup
 -- v4 [teh]decay Some minor improvements and fixes
+-- v5 [teh]decay fix spectator mode again (thx to jK)
 
 local GetUnitPosition     = Spring.GetUnitPosition
 local glDrawGroundCircle  = gl.DrawGroundCircle
 local GetUnitDefID = Spring.GetUnitDefID
 local lower                 = string.lower
-local spGetVisibleUnits = Spring.GetVisibleUnits
+local spGetAllUnits = Spring.GetAllUnits
 local spGetSpectatingState = Spring.GetSpectatingState
+local spGetMyPlayerID		= Spring.GetMyPlayerID
+local spGetPlayerInfo		= Spring.GetPlayerInfo
 
 local blastCircleDivs = 100
 local weapNamTab		  = WeaponDefNames
@@ -71,7 +74,13 @@ end
 function widget:DrawWorldPreUnit()
   local _, specFullView, _ = spGetSpectatingState()
 
-  if not specFullView then
+  if not
+
+
+
+
+
+  specFullView then
       notInSpecfullmode = true
   else
       if notInSpecfullmode then
@@ -118,13 +127,13 @@ function widget:Initialize()
 end
 
 function detectSpectatorView()
-    local _, _, spec, teamId = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+    local _, _, spec, teamId = spGetPlayerInfo(spGetMyPlayerID())
 
     if spec then
         spectatorMode = true
     end
 
-    local visibleUnits = spGetVisibleUnits()
+    local visibleUnits = spGetAllUnits()
     if visibleUnits ~= nil then
         for _, unitID in ipairs(visibleUnits) do
             local udefId = GetUnitDefID(unitID)
