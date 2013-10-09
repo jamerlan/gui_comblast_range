@@ -67,6 +67,12 @@ function widget:UnitEnteredLos(unitID, unitTeam)
     end
 end
 
+function widget:UnitCreated(unitID, unitDefID, teamID, builderID)
+    if UnitDefs[unitDefID].canManualFire then
+        commanders[unitID] = true
+    end
+end
+
 function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
     if UnitDefs[unitDefID].canManualFire then
         commanders[unitID] = true
