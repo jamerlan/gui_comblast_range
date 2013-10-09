@@ -2,7 +2,7 @@ function widget:GetInfo()
     return {
         name      = "Comblast Range v7",
         desc      = "Draws a circle that displays commander blast range",
-        author    = "TheFatController",
+        author    = "TheFatController and [teh]decay",
         date      = "January 24, 2009",
         license   = "MIT/X11",
         layer     = 0,
