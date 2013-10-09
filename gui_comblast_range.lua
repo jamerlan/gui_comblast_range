@@ -1,12 +1,12 @@
 function widget:GetInfo()
     return {
-        name      = "Comblast Range v6",
+        name      = "Comblast Range v7",
         desc      = "Draws a circle that displays commander blast range",
         author    = "TheFatController",
         date      = "January 24, 2009",
         license   = "MIT/X11",
         layer     = 0,
-        version   = 6,
+        version   = 7,
         enabled   = true  -- loaded by default
     }
 end
@@ -19,6 +19,7 @@ end
 -- v4 [teh]decay Some minor improvements and fixes
 -- v5 [teh]decay fix spectator mode again (thx to jK)
 -- v6 [teh]decay True dgun radius added
+-- v7 [teh]decay Handle shared commanders correctly
 
 local GetUnitPosition     = Spring.GetUnitPosition
 local glDrawGroundCircle  = gl.DrawGroundCircle
@@ -63,6 +64,19 @@ function widget:UnitEnteredLos(unitID, unitTeam)
         if UnitDefs[unitDefID].canManualFire then
             commanders[unitID] = true
         end
+    end
+end
+
+function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
+    if UnitDefs[unitDefID].canManualFire then
+        commanders[unitID] = true
+    end
+end
+
+
+function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
+    if UnitDefs[unitDefID].canManualFire then
+        commanders[unitID] = true
     end
 end
 
